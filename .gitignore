@@ -1,0 +1,3 @@
+# Cache's and Node Modules
+node_modules/
+.DS_Store
