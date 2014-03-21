@@ -1,6 +1,4 @@
-class TweenMachine
-
-  @easings:
+TweenMachine::easings =
     Linear:
       None: (k) ->
         k
