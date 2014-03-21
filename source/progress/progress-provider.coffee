@@ -13,8 +13,3 @@ class ProgressProvider
 
   inBounds: ->
     BOUNDS.lower <= @progress <= BOUNDS.upper
-
-
-###
-tween = new TweenMachine(currentPosition, endPosition)
-###
