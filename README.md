@@ -13,6 +13,9 @@ To start, create a new TweenMachine:
 
 var tween = new TweenMachine(0, 100);
 
+tween.easing('Bounce.InOut')
+     .interpolation('Bezier')
+
 var valueAtZeroPercent = tween.get(0.0),
     valueAtFiftyPercent = tween.get(0.5),
     valueAtHundredPercent = tween.get(1);
