@@ -1,8 +1,18 @@
-(function() {
-  var ProgressProvider, TweenMachine, utils;
+/*
 
-  TweenMachine = (function() {
-    var generateId, isNumber;
+TweenMachine
+@property {Number | Array} start
+@property {Number | Array} end
+@property {TweenMachine.Easing} easing
+@property {TweenMachine.Interpolation} interpolation
+*/
+
+
+(function() {
+  var ProgressProvider, utils;
+
+  this.TweenMachine = (function() {
+    var ProgressFunctions, clamp, generateId, isNumber;
 
     generateId = function() {
       return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
@@ -17,36 +27,72 @@
       return !isNaN(parseFloat(candidate)) && isFinite(candidate);
     };
 
-    TweenMachine.tweens = [];
-
-    TweenMachine.all = function() {
-      return this.tweens;
+    clamp = function(lower, upper, value) {
+      if (value < lower) {
+        return lower;
+      } else if (value > upper) {
+        return upper;
+      } else {
+        return value;
+      }
     };
 
-    function TweenMachine(start, end, easing, interpolation) {
+    TweenMachine.tweens = {};
+
+    TweenMachine.clear = function() {
+      return TweenMachine.tweens.length = 0;
+    };
+
+    ProgressFunctions = {
+      Numeric: function(progress) {
+        return this.start + (this.end - this.start) * this.easingFunction(progress);
+      },
+      Array: function(progress) {
+        return this.interpolationFunction(this.end, this.easingFunction(progress));
+      }
+    };
+
+    function TweenMachine(start, end, easingFunction, interpolationFunction) {
       this.start = start;
       this.end = end;
-      this.easing = easing;
-      this.interpolation = interpolation;
-      if (!isNumber(this.start && isNumber(this.end))) {
-        throw new Error('Must provide numeric start and end values');
+      this.easingFunction = easingFunction;
+      this.interpolationFunction = interpolationFunction;
+      if (isNumber(this.start) && isNumber(this.end)) {
+        this.type = 'Numeric';
+      } else if (Array.isArray(this.start) && Array.isArray(this.end)) {
+        this.type = 'Array';
+      } else {
+        throw new Error('Must provide either numeric or Array start and end values.');
       }
-      this.easing || (this.easing = TweenMachine.easings.Linear.None);
-      this.interpolation || (this.interpolation = TweenMachine.interpolations.Linear);
+      this.easingFunction || (this.easingFunction = TweenMachine.easings.Linear.None);
+      this.interpolationFunction || (this.interpolationFunction = TweenMachine.interpolations.Linear);
       this.$id = generateId();
-      TweenMachine.tweens.push(this);
+      TweenMachine.tweens[this.$id] = this;
       return this;
     }
 
+    TweenMachine.prototype.easing = function(name) {
+      var category, type, _ref;
+      _ref = name.split('.'), category = _ref[0], type = _ref[1];
+      this.easingFunction = TweenMachine.easings[category][type];
+      return this;
+    };
+
+    TweenMachine.prototype.interpolation = function(name) {
+      this.interpolationFunction = TweenMachine.interpolations[name];
+      return this;
+    };
+
     TweenMachine.prototype.at = function(progress) {
-      return this.interpolation(this.end, this.easing(progress));
+      progress = clamp(0, 1, progress);
+      return ProgressFunctions[this.type].bind(this)(progress);
     };
 
     return TweenMachine;
 
   })();
 
-  TweenMachine.prototype.easings = {
+  this.TweenMachine.easings = {
     Linear: {
       None: function(k) {
         return k;
@@ -245,7 +291,7 @@
     },
     Bounce: {
       In: function(k) {
-        return 1 - TWEEN.Easing.Bounce.Out(1 - k);
+        return 1 - TweenMachine.easings.Bounce.Out(1 - k);
       },
       Out: function(k) {
         if (k < (1 / 2.75)) {
@@ -260,9 +306,9 @@
       },
       InOut: function(k) {
         if (k < 0.5) {
-          return TWEEN.Easing.Bounce.In(k * 2) * 0.5;
+          return TweenMachine.easings.In(k * 2) * 0.5;
         }
-        return TWEEN.Easing.Bounce.Out(k * 2 - 1) * 0.5 + 0.5;
+        return TweenMachine.easings.Bounce.Out(k * 2 - 1) * 0.5 + 0.5;
       }
     }
   };
@@ -302,7 +348,7 @@
     }
   };
 
-  TweenMachine.prototype.interpolations = {
+  this.TweenMachine.interpolations = {
     Linear: function(v, k) {
       var f, fn, i, m;
       m = v.length - 1;
@@ -381,5 +427,10 @@
     return ProgressProvider;
 
   })();
+
+  /*
+  tween = new TweenMachine(currentPosition, endPosition)
+  */
+
 
 }).call(this);

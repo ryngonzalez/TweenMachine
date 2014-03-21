@@ -24,7 +24,7 @@ utils =
     t3 = t * t2
     (2 * p1 - 2 * p2 + v0 + v1) * t3 + (-3 * p1 + 3 * p2 - 2 * v0 - v1) * t2 + v0 * t + p1
 
-TweenMachine::interpolations =
+@TweenMachine.interpolations =
   Linear: (v, k) ->
     m = v.length - 1
     f = m * k

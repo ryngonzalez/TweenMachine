@@ -1,9 +1,9 @@
 module.exports = (grunt) ->
 
   files = [
-    'src/*.coffee'
-    'src/support/*.coffee'
-    'src/progress/*.coffee'
+    'source/*.coffee'
+    'source/support/*.coffee'
+    'source/progress/*.coffee'
   ]
 
   grunt.initConfig
@@ -13,7 +13,7 @@ module.exports = (grunt) ->
 
       coffee:
         files: files
-        tasks: ['build']
+        tasks: ['default']
 
     coffee:
       build:
