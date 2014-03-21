@@ -9,7 +9,7 @@ TweenMachine
 
 
 (function() {
-  var ProgressProvider, utils;
+  var utils;
 
   this.TweenMachine = (function() {
     var ProgressFunctions, clamp, generateId, isNumber;
@@ -399,38 +399,5 @@ TweenMachine
       }
     }
   };
-
-  ProgressProvider = (function() {
-    var BOUNDS;
-
-    BOUNDS = {
-      lower: 0.0,
-      upper: 1.0
-    };
-
-    function ProgressProvider() {
-      this.progress = 0;
-    }
-
-    ProgressProvider.prototype.get = function() {
-      if (!this.inBounds()) {
-        throw new Error('Progress must be between 0.0 and 1.0');
-      }
-      return this.progress;
-    };
-
-    ProgressProvider.prototype.inBounds = function() {
-      var _ref;
-      return (BOUNDS.lower <= (_ref = this.progress) && _ref <= BOUNDS.upper);
-    };
-
-    return ProgressProvider;
-
-  })();
-
-  /*
-  tween = new TweenMachine(currentPosition, endPosition)
-  */
-
 
 }).call(this);
