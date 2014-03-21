@@ -36,3 +36,4 @@ module.exports = (grunt) ->
 
   grunt.registerTask 'build:development', ['coffee:build']
   grunt.registerTask 'build:production', ['coffee:build', 'uglify:production']
+  grunt.registerTask 'default', ['build:production']
