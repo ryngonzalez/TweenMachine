@@ -5,7 +5,7 @@ wanted to do a tween based on touch position over and area, or the percentage
 of a download completed? TweenMachine decouples the tweening logic of Tween.js
 from depencies of time.
 
-# Usage
+## Usage
 
 To start, create a new TweenMachine:
 
