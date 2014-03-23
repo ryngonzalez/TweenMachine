@@ -1,9 +1,7 @@
 module.exports = (grunt) ->
 
   files = [
-    'source/*.coffee'
-    'source/support/*.coffee'
-    'source/progress/*.coffee'
+    'src/*.coffee'
   ]
 
   grunt.initConfig
