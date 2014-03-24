@@ -1,6 +1,7 @@
 module.exports = (grunt) ->
 
   files = [
+    'src/tweenmachine.coffee'
     'src/*.coffee'
   ]
 
