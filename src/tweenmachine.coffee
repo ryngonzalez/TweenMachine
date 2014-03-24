@@ -27,11 +27,11 @@ class @TweenMachine
     @type = 'Numeric' if isNumber(@start) and isNumber(@end)
     @type = 'Array' if Array.isArray(@start) and Array.isArray(@end)
 
-    unless @type? throw new Error 'Must provide either numeric or Array start and end values.'
+    unless @type? then throw new Error 'Must provide either numeric or Array start and end values.'
 
+    @$id = TweenMachine.tweens.length
     @easer = TweenMachine.easings.Linear.None
     @interpolator = TweenMachine.interpolations.Linear
-    @$id = @tweens.length
 
     TweenMachine.tweens.push this
     return this

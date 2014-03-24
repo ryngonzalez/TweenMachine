@@ -12,16 +12,7 @@ TweenMachine
   var utils;
 
   this.TweenMachine = (function() {
-    var ProgressFunctions, clamp, generateId, isNumber;
-
-    generateId = function() {
-      return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
-        var r, v;
-        r = (Math.random() * 16) | 0;
-        v = c === 'x' ? r : r & 0x3 | 0x8;
-        return v.toString(16);
-      });
-    };
+    var clamp, isNumber;
 
     isNumber = function(candidate) {
       return !isNaN(parseFloat(candidate)) && isFinite(candidate);
@@ -30,62 +21,58 @@ TweenMachine
     clamp = function(lower, upper, value) {
       if (value < lower) {
         return lower;
-      } else if (value > upper) {
-        return upper;
-      } else {
-        return value;
       }
+      if (value > upper) {
+        return upper;
+      }
+      return value;
     };
 
-    TweenMachine.tweens = {};
+    TweenMachine.tweens = [];
 
     TweenMachine.clear = function() {
       return TweenMachine.tweens.length = 0;
     };
 
-    ProgressFunctions = {
-      Numeric: function(progress) {
-        return this.start + (this.end - this.start) * this.easingFunction(progress);
-      },
-      Array: function(progress) {
-        return this.interpolationFunction(this.end, this.easingFunction(progress));
-      }
-    };
-
-    function TweenMachine(start, end, easingFunction, interpolationFunction) {
+    function TweenMachine(start, end) {
       this.start = start;
       this.end = end;
-      this.easingFunction = easingFunction;
-      this.interpolationFunction = interpolationFunction;
       if (isNumber(this.start) && isNumber(this.end)) {
         this.type = 'Numeric';
-      } else if (Array.isArray(this.start) && Array.isArray(this.end)) {
+      }
+      if (Array.isArray(this.start) && Array.isArray(this.end)) {
         this.type = 'Array';
-      } else {
+      }
+      if (this.type == null) {
         throw new Error('Must provide either numeric or Array start and end values.');
       }
-      this.easingFunction || (this.easingFunction = TweenMachine.easings.Linear.None);
-      this.interpolationFunction || (this.interpolationFunction = TweenMachine.interpolations.Linear);
-      this.$id = generateId();
-      TweenMachine.tweens[this.$id] = this;
+      this.$id = TweenMachine.tweens.length;
+      this.easer = TweenMachine.easings.Linear.None;
+      this.interpolator = TweenMachine.interpolations.Linear;
+      TweenMachine.tweens.push(this);
       return this;
     }
 
     TweenMachine.prototype.easing = function(name) {
       var category, type, _ref;
       _ref = name.split('.'), category = _ref[0], type = _ref[1];
-      this.easingFunction = TweenMachine.easings[category][type];
+      this.easer = TweenMachine.easings[category][type];
       return this;
     };
 
     TweenMachine.prototype.interpolation = function(name) {
-      this.interpolationFunction = TweenMachine.interpolations[name];
+      this.interpolator = TweenMachine.interpolations[name];
       return this;
     };
 
     TweenMachine.prototype.at = function(progress) {
       progress = clamp(0, 1, progress);
-      return ProgressFunctions[this.type].bind(this)(progress);
+      switch (this.type) {
+        case 'Numeric':
+          return this.start + (this.end - this.start) * this.easer(progress);
+        case 'Array':
+          return this.interpolator(this.end, this.easer(progress));
+      }
     };
 
     return TweenMachine;
