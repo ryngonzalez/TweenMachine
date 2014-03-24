@@ -19,3 +19,7 @@ var valueAtZeroPercent = tween.get(0.0),
     valueAtHundredPercent = tween.get(1);
 
 ```
+
+## Easing Functions
+Based off of [Robert Penner's Easing Functions](http://www.robertpenner.com/easing/).
+![](http://i.imgur.com/e8Ocshv.png)
