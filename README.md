@@ -1,4 +1,5 @@
-# TweenMachine
+![TweenMachine](http://i.imgur.com/183j75n.png)
+
 [Tween.js](https://github.com/sole/tween.js/) provides wonderful support for
 tweening between states while over a set duration of time. But what if you
 wanted to do a tween based on touch position over an area, or the percentage
