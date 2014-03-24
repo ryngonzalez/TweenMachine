@@ -10,63 +10,44 @@ TweenMachine
 
 class @TweenMachine
 
-  # http://byronsalau.com/blog/how-to-create-a-guid-uuid-in-javascript/
-  generateId = ->
-    return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace /[xy]/g, (c) ->
-        r = (Math.random() * 16) | 0 
-        v = if c is 'x' then r else (r & 0x3 | 0x8)
-        return v.toString(16)
-
   # http://stackoverflow.com/a/1830844/652765
   isNumber = (candidate) ->
     return !isNaN(parseFloat(candidate)) and isFinite(candidate)
 
   clamp = (lower, upper, value) ->
-    if value < lower 
-      lower 
-    else if value > upper
-      upper
-    else 
-      value
+    return lower if value < lower
+    return upper if value > upper
+    return value
 
-  @tweens: {}
+  @tweens = []
+  @clear = -> TweenMachine.tweens.length = 0
 
-  @clear: ->
-    TweenMachine.tweens.length = 0
-  
-  ProgressFunctions =
+  constructor: (@start, @end) ->
 
-    Numeric: (progress) ->
-      @start + (@end - @start) * @easingFunction(progress)
+    @type = 'Numeric' if isNumber(@start) and isNumber(@end)
+    @type = 'Array' if Array.isArray(@start) and Array.isArray(@end)
 
-    Array: (progress) ->
-      @interpolationFunction @end, @easingFunction(progress)
+    unless @type? throw new Error 'Must provide either numeric or Array start and end values.'
 
-  constructor: (@start, @end, @easingFunction, @interpolationFunction) ->
+    @easer = TweenMachine.easings.Linear.None
+    @interpolator = TweenMachine.interpolations.Linear
+    @$id = @tweens.length
 
-    if isNumber(@start) and isNumber(@end)
-      @type = 'Numeric'
-    else if Array.isArray(@start) and Array.isArray(@end)
-      @type = 'Array'
-    else
-      throw new Error 'Must provide either numeric or Array start and end values.'
-
-    @easingFunction or= TweenMachine.easings.Linear.None
-    @interpolationFunction or= TweenMachine.interpolations.Linear
-    @$id = generateId()
-
-    TweenMachine.tweens[@$id] = this
+    TweenMachine.tweens.push this
     return this
 
   easing: (name) ->
     [category, type] = name.split('.')
-    @easingFunction = TweenMachine.easings[category][type]
-    this
+    @easer = TweenMachine.easings[category][type]
+    return this
 
   interpolation: (name) ->
-    @interpolationFunction = TweenMachine.interpolations[name]
-    this
+    @interpolator = TweenMachine.interpolations[name]
+    return this
 
   at: (progress) ->
     progress = clamp(0, 1, progress)
-    ProgressFunctions[@type].bind(this)(progress)
+
+    switch @type
+      when 'Numeric' then @start + (@end - @start) * @easer(progress)
+      when 'Array' then @interpolator @end, @easer(progress)
